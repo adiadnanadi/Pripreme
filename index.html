@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generator Nastavnih Priprema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0f0f14;--paper:#f5f0e8;--cream:#ede7d5;--blue:#003a70;--blue-mid:#0057a8;--gold:#c8921a;--gold-light:#f1c94e;--red:#b03030;--green:#1a6b3a;--border:#c5b99a;--shadow:rgba(15,15,20,0.15)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--ink);font-family:'Lora',Georgia,serif;min-height:100vh;position:relative;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(ellipse at 20% 10%,rgba(0,58,112,.3) 0%,transparent 50%),radial-gradient(ellipse at 80% 90%,rgba(200,146,26,.15) 0%,transparent 50%);pointer-events:none;z-index:0}
+.page-wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:40px 24px 80px}
+header{text-align:center;padding:48px 0 40px;position:relative}
+header::after{content:'';display:block;width:120px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:28px auto 0}
+.header-eyebrow{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:4px;color:var(--gold);text-transform:uppercase;margin-bottom:18px;opacity:.9}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(2.4rem,5vw,3.8rem);font-weight:900;color:var(--paper);line-height:1.1;letter-spacing:-.02em}
+header h1 span{color:var(--gold-light)}
+.header-sub{font-family:'Lora',serif;font-style:italic;font-size:1rem;color:rgba(245,240,232,.55);margin-top:14px}
+.card{background:var(--paper);border-radius:4px;box-shadow:0 4px 40px var(--shadow),inset 0 1px 0 rgba(255,255,255,.8);position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--blue),var(--blue-mid),var(--gold))}
+.card-inner{padding:36px 40px 40px}
+.api-section{margin-bottom:32px;padding-bottom:32px;border-bottom:1px solid var(--border)}
+.section-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--blue);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.field-group{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+.field-group.triple{grid-template-columns:1fr 1fr 1fr}
+.field-group.full{grid-template-columns:1fr}
+.field{display:flex;flex-direction:column;gap:7px}
+label{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--blue);font-weight:500}
+input,textarea,select{font-family:'Lora',serif;font-size:14px;padding:11px 14px;border:1.5px solid var(--border);background:var(--cream);border-radius:3px;color:var(--ink);transition:border-color .2s,box-shadow .2s,background .2s;outline:none;width:100%}
+input:focus,textarea:focus,select:focus{border-color:var(--blue-mid);background:#fff;box-shadow:0 0 0 3px rgba(0,87,168,.1)}
+input::placeholder,textarea::placeholder{color:rgba(15,15,20,.3);font-style:italic}
+textarea{resize:vertical;min-height:110px;line-height:1.6}
+.api-hint{font-family:'DM Mono',monospace;font-size:10px;color:rgba(15,15,20,.45);margin-top:5px}
+.api-hint a{color:var(--blue-mid)}
+.btn{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;letter-spacing:.5px;cursor:pointer;border:none;border-radius:3px;transition:all .22s;padding:14px 28px;display:inline-flex;align-items:center;gap:10px;position:relative}
+.btn-primary{background:var(--blue);color:var(--paper);width:100%;justify-content:center;margin-top:8px;box-shadow:0 2px 12px rgba(0,58,112,.35)}
+.btn-primary:hover:not(:disabled){background:var(--blue-mid);box-shadow:0 4px 20px rgba(0,87,168,.45);transform:translateY(-1px)}
+.btn-primary:disabled{opacity:.55;cursor:not-allowed}
+.btn-gold{background:var(--gold);color:#fff;font-size:15px;padding:12px 22px;box-shadow:0 2px 10px rgba(200,146,26,.3)}
+.btn-gold:hover{background:#b5820f;transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--blue);border:1.5px solid var(--blue);font-size:13px;padding:10px 18px}
+.btn-outline:hover{background:var(--blue);color:var(--paper)}
+.btn-green{background:var(--green);color:#fff;font-size:15px;padding:12px 22px}
+.btn-green:hover{background:#145530;transform:translateY(-1px)}
+.spinner{width:18px;height:18px;border:2.5px solid rgba(245,240,232,.3);border-top-color:var(--paper);border-radius:50%;animation:spin .7s linear infinite;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.status-bar{padding:12px 16px;border-radius:3px;font-family:'DM Mono',monospace;font-size:12px;margin-top:18px;display:none;gap:10px;align-items:center}
+.status-bar.info{background:rgba(0,87,168,.1);color:var(--blue);border:1px solid rgba(0,87,168,.2);display:flex}
+.status-bar.success{background:rgba(26,107,58,.1);color:var(--green);border:1px solid rgba(26,107,58,.2);display:flex}
+.status-bar.error{background:rgba(176,48,48,.1);color:var(--red);border:1px solid rgba(176,48,48,.2);display:flex}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.info .status-dot{background:var(--blue-mid);animation:pulse 1.2s ease infinite}
+.success .status-dot{background:var(--green)}
+.error .status-dot{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.result-section{margin-top:36px;display:none}
+.result-section.visible{display:block}
+.result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px}
+.result-title{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--paper);font-weight:700}
+.result-actions{display:flex;gap:10px;flex-wrap:wrap}
+.latex-editor{background:#1a1a2e;border-radius:4px;border:1px solid rgba(245,240,232,.1);overflow:hidden}
+.editor-topbar{background:#12121f;padding:10px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,.06)}
+.editor-dot{width:10px;height:10px;border-radius:50%}
+.editor-filename{font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,.4);margin-left:8px}
+#latexOutput{display:block;width:100%;min-height:380px;background:transparent;color:#c8d3f5;font-family:'DM Mono',monospace;font-size:12.5px;line-height:1.65;padding:20px;border:none;outline:none;resize:vertical;white-space:pre;overflow-x:auto}
+.compile-section{margin-top:28px;background:var(--paper);border-radius:4px;overflow:hidden;border:1.5px solid var(--border);display:none}
+.compile-section.visible{display:block}
+.compile-header{background:var(--cream);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px}
+.compile-title{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--blue);font-weight:700}
+.compile-body{padding:20px}
+.compile-options{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.pdf-frame-wrap{width:100%;background:#525659;border-radius:3px;overflow:hidden;display:none}
+.pdf-frame-wrap.visible{display:block}
+#pdfFrame{width:100%;height:700px;border:none;display:block}
+.compile-note{font-family:'DM Mono',monospace;font-size:10.5px;color:rgba(15,15,20,.45);margin-top:10px;line-height:1.6}
+.ornament{text-align:center;color:rgba(200,146,26,.35);font-size:22px;letter-spacing:8px;margin:32px 0 24px;user-select:none}
+.info-banner{background:rgba(200,146,26,.12);border:1px solid rgba(200,146,26,.35);border-radius:3px;padding:12px 16px;margin-bottom:20px;font-family:'DM Mono',monospace;font-size:11px;color:#8a6010;line-height:1.7}
+.info-banner strong{color:#7a5008}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:rgba(255,255,255,.04)}
+::-webkit-scrollbar-thumb{background:rgba(200,146,26,.35);border-radius:3px}
+@media(max-width:640px){.card-inner{padding:24px 20px}.field-group,.field-group.triple{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="page-wrap">
+  <header>
+    <div class="header-eyebrow">⸻ Elektrotehnička škola Tuzla ⸻</div>
+    <h1>Generator<br><span>Nastavnih Priprema</span></h1>
+    <p class="header-sub">Unesite podatke — AI generiše kompletnu pripremu u LaTeX-u</p>
+  </header>
+
+  <div class="card">
+    <div class="card-inner">
+
+      <div class="api-section">
+        <div class="section-label">Groq API Ključ</div>
+        <div class="info-banner">
+          ⓘ Ovaj fajl mora biti otvoren kroz <strong>lokalni HTTP server</strong>, ne direktno iz Explorera.<br>
+          Najlakše: u terminalu u folderu sa ovim fajlom pokreni → <strong>python -m http.server 8080</strong> → otvori <strong>http://localhost:8080</strong><br>
+          Ili: VS Code → desni klik na fajl → <em>Open with Live Server</em>
+        </div>
+        <div class="field">
+          <label>API KEY (Mistral)</label>
+          <input type="password" id="apiKey" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+          <div class="api-hint">Besplatan ključ: <a href="https://console.mistral.ai" target="_blank">console.mistral.ai</a> — čuva se samo lokalno u browseru</div>
+        </div>
+      </div>
+
+      <div class="section-label">Škola i nastavnik</div>
+      <div class="field-group" style="margin-bottom:20px">
+        <div class="field">
+          <label>Škola</label>
+          <input type="text" id="skola" value="Elektrotehnička škola Tuzla">
+        </div>
+        <div class="field">
+          <label>Nastavnik (ime, titula)</label>
+          <input type="text" id="nastavnik" value="Adnan Sahanić, dipl. ing. el. teh.">
+        </div>
+      </div>
+
+      <div class="section-label">Podaci o nastavnom času</div>
+      <div class="field-group" style="margin-bottom:20px">
+        <div class="field">
+          <label>Predmet</label>
+          <input type="text" id="predmet" placeholder="npr. Matematika, Fizika, Hemija...">
+        </div>
+        <div class="field">
+          <label>Nastavna jedinica (tema)</label>
+          <input type="text" id="tema" placeholder="npr. Kirchhoffovi zakoni">
+        </div>
+      </div>
+
+      <div class="field-group triple" style="margin-bottom:20px">
+        <div class="field">
+          <label>Razred</label>
+          <input type="text" id="razred" placeholder="npr. Treći (III)">
+        </div>
+        <div class="field">
+          <label>Broj učenika</label>
+          <input type="number" id="brojUcenika" value="19" min="1" max="40">
+        </div>
+        <div class="field">
+          <label>Tip časa</label>
+          <select id="tipCasa">
+            <option value="Obrada novog gradiva">Obrada novog gradiva</option>
+            <option value="Ponavljanje i utvrđivanje">Ponavljanje i utvrđivanje</option>
+            <option value="Vježba">Vježba</option>
+            <option value="Provjera znanja">Provjera znanja</option>
+            <option value="Kombinirani čas">Kombinirani čas</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section-label">Dodatne napomene (opciono)</div>
+      <div class="field-group full" style="margin-bottom:28px">
+        <div class="field">
+          <label>Napomene / korelacija / resursi</label>
+          <textarea id="napomene" placeholder="npr. Korelacija sa Osnovama elektrotehnike. Koristiti simulaciju u Multisimu..."></textarea>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="generateBtn" onclick="generatePriprema()">
+        <span id="btnText">✦ Generiši Pripremu</span>
+        <div class="spinner" id="btnSpinner"></div>
+      </button>
+      <div class="status-bar" id="statusBar">
+        <div class="status-dot"></div>
+        <span id="statusText"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="result-section" id="resultSection">
+    <div class="ornament">✦ ✦ ✦</div>
+    <div class="result-header">
+      <div class="result-title">LaTeX Priprema</div>
+      <div class="result-actions">
+        <button class="btn btn-outline" onclick="copyLatex()">⎘ Kopiraj</button>
+        <button class="btn btn-outline" onclick="downloadLatex()">↓ Skini .tex</button>
+        <button class="btn btn-gold" onclick="showCompileSection()">▶ Kompajliraj → PDF</button>
+      </div>
+    </div>
+    <div class="latex-editor">
+      <div class="editor-topbar">
+        <div class="editor-dot" style="background:#ff5f57"></div>
+        <div class="editor-dot" style="background:#febc2e"></div>
+        <div class="editor-dot" style="background:#28c840"></div>
+        <span class="editor-filename">priprema_nastavni_cas.tex</span>
+      </div>
+      <textarea id="latexOutput" spellcheck="false"></textarea>
+    </div>
+  </div>
+
+  <div class="compile-section" id="compileSection">
+    <div class="compile-header">
+      <div class="compile-title">📄 Online LaTeX Kompajler</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-green" onclick="compileTexlive()">▶ Kompajliraj → PDF</button>
+        <button class="btn btn-gold" onclick="compileWithOverleaf()">⚡ Otvori u Overleaf</button>
+      </div>
+    </div>
+    <div class="compile-body">
+      <div class="status-bar" id="compileStatus">
+        <div class="status-dot"></div>
+        <span id="compileStatusText"></span>
+      </div>
+      <div class="pdf-frame-wrap" id="pdfFrameWrap">
+        <iframe id="pdfFrame" title="PDF Preview"></iframe>
+      </div>
+      <p class="compile-note">
+        ⓘ <strong>Kompajliraj → PDF</strong> šalje LaTeX na TeXLive.net i prikazuje PDF direktno.<br>
+        ⓘ <strong>Overleaf</strong> otvara projekt u novom tabu — klikni Recompile, pa Download PDF.<br>
+        ⓘ Ako PDF ne prikazuje inline, klikni <strong>Otvori u Overleaf</strong>.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+const ORIGINAL_DOC = `\\documentclass[a4paper,11pt]{article}
+\\usepackage[utf8]{inputenc}
+\\usepackage[T1]{fontenc}
+\\usepackage[croatian]{babel}
+\\usepackage{geometry}
+\\usepackage{graphicx}
+\\usepackage{xcolor}
+\\usepackage{tikz}
+\\usepackage{circuitikz}
+\\usepackage{fontawesome5}
+\\usepackage{booktabs}
+\\usepackage{array}
+\\usepackage{multirow}
+\\usepackage{tabularx}
+\\usepackage{colortbl}
+\\usepackage{fancyhdr}
+\\usepackage{enumitem}
+\\usepackage{tcolorbox}
+\\usepackage{titlesec}
+\\usepackage{hyperref}
+\\usepackage{amsmath}
+\\tcbuselibrary{skins, breakable}
+\\usetikzlibrary{shapes.geometric, arrows.meta, positioning, calc}
+\\geometry{left=1.8cm,right=1.8cm,top=2cm,bottom=2cm}
+\\definecolor{primaryblue}{RGB}{0, 73, 135}
+\\definecolor{secondaryblue}{RGB}{0, 112, 192}
+\\definecolor{accentorange}{RGB}{255, 153, 0}
+\\definecolor{accentgreen}{RGB}{40, 167, 69}
+\\definecolor{darkgray}{RGB}{45, 45, 45}
+\\definecolor{lightgray}{RGB}{240, 240, 240}
+\\definecolor{goldcolor}{RGB}{241, 196, 15}
+\\definecolor{darkgreen}{RGB}{0, 128, 0}
+\\pagestyle{fancy}
+\\fancyhf{}
+\\fancyhead[L]{\\textcolor{primaryblue}{\\small Elektrotehnička škola Tuzla}}
+\\fancyhead[R]{\\textcolor{primaryblue}{\\small Elektronika}}
+\\fancyfoot[C]{\\textcolor{primaryblue}{\\thepage}}
+\\renewcommand{\\headrulewidth}{1.5pt}
+\\renewcommand{\\headrule}{\\hbox to\\headwidth{\\color{primaryblue}\\leaders\\hrule height \\headrulewidth\\hfill}}
+\\titleformat{\\section}{\\large\\bfseries\\color{primaryblue}}{\\thesection.}{0.5em}{}[\\titlerule]
+\\titlespacing*{\\section}{0pt}{10pt}{6pt}
+\\titleformat{\\subsection}{\\normalsize\\bfseries\\color{secondaryblue}}{\\thesubsection}{0.5em}{}
+\\titlespacing*{\\subsection}{0pt}{8pt}{4pt}
+\\newtcolorbox{infobox}[1][]{colback=primaryblue!5,colframe=primaryblue,fonttitle=\\bfseries\\small,title=#1,rounded corners,boxrule=1pt,left=4pt,right=4pt,top=3pt,bottom=3pt}
+\\newtcolorbox{alertbox}[1][]{colback=accentorange!10,colframe=accentorange,fonttitle=\\bfseries\\small,title=#1,rounded corners,boxrule=1pt,left=4pt,right=4pt,top=3pt,bottom=3pt}
+\\newtcolorbox{successbox}[1][]{colback=accentgreen!10,colframe=accentgreen,fonttitle=\\bfseries\\small,title=#1,rounded corners,boxrule=1pt,left=4pt,right=4pt,top=3pt,bottom=3pt}
+\\newcolumntype{L}[1]{>{\\raggedright\\arraybackslash}p{#1}}
+\\newcolumntype{C}[1]{>{\\centering\\arraybackslash}p{#1}}
+\\begin{document}
+\\begin{titlepage}
+\\begin{tikzpicture}[remember picture, overlay]
+    \\fill[primaryblue] (current page.north west) rectangle ([yshift=-3.5cm]current page.north east);
+    \\fill[secondaryblue, opacity=0.5] ([yshift=-2.5cm]current page.north west) -- ([yshift=-3.5cm]current page.north west) -- ([xshift=6cm, yshift=-3.5cm]current page.north west) -- cycle;
+    \\fill[primaryblue] (current page.south west) rectangle ([yshift=1.5cm]current page.south east);
+    \\node[circle, fill=goldcolor, minimum size=2.5cm] at ([yshift=-1.7cm]current page.north) {};
+    \\node[primaryblue, font=\\fontsize{18}{22}\\selectfont\\bfseries] at ([yshift=-1.7cm]current page.north) {I\\textsuperscript{2}L};
+\\end{tikzpicture}
+\\vspace{4cm}
+\\begin{center}
+    {\\fontsize{12}{14}\\selectfont\\textcolor{darkgray}{ELEKTROTEHNIČKA ŠKOLA TUZLA}}\\
+    \\vspace{2.5cm}
+    {\\fontsize{24}{28}\\selectfont\\textcolor{primaryblue}{\\textbf{PRIPREMA ZA NASTAVNI ČAS}}}
+    \\vspace{1.5cm}
+    \\begin{tcolorbox}[colback=lightgray,colframe=primaryblue,width=12cm,center,boxrule=2pt,arc=4mm]
+        \\centering
+        {\\Large\\textbf{Nastavna jedinica:}}\\\\[0.3cm]
+        {\\LARGE\\textcolor{primaryblue}{\\textbf{I\\textsuperscript{2}L -- Integrirana Injekcijska Logika}}}\\\\[0.2cm]
+        {\\large\\textcolor{secondaryblue}{Integrated Injection Logic}}
+    \\end{tcolorbox}
+    \\vspace{2.5cm}
+    \\begin{tabular}{ll}
+        \\textbf{Nastavnik:} & Adnan Sahanić, dipl.~ing.~el.~teh. \\\\[0.15cm]
+        \\textbf{Predmet:} & Elektronika \\\\[0.15cm]
+        \\textbf{Školska godina:} & 2025/2026.
+    \\end{tabular}
+\\end{center}
+\\vfill
+\\begin{tikzpicture}[remember picture, overlay]
+    \\node[white, anchor=south] at ([yshift=0.5cm]current page.south) {\\small Tuzla, \\today};
+\\end{tikzpicture}
+\\end{titlepage}
+\\section{Osnovni podaci o nastavnom času}
+\\begin{center}
+\\renewcommand{\\arraystretch}{1.4}
+\\small
+\\begin{tabular}{|>{\\columncolor{primaryblue!10}}L{3.8cm}|L{5cm}|>{\\columncolor{primaryblue!10}}L{3cm}|L{3.5cm}|}
+    \\hline
+    \\rowcolor{primaryblue}
+    \\multicolumn{4}{|c|}{\\textcolor{white}{\\textbf{IDENTIFIKACIJSKI PODACI}}} \\\\
+    \\hline
+    \\textbf{Predmet:} & Elektronika & \\textbf{Datum:} & \\today \\\\
+    \\hline
+    \\textbf{Nastavna jedinica:} & \\multicolumn{3}{l|}{I\\textsuperscript{2}L -- Integrirana Injekcijska Logika} \\\\
+    \\hline
+    \\textbf{Razred:} & Četvrti (IV) & \\textbf{Trajanje:} & 45 minuta \\\\
+    \\hline
+    \\textbf{Tip časa:} & Obrada novog gradiva & \\textbf{Broj učenika:} & 19 \\\\
+    \\hline
+\\end{tabular}
+\\end{center}
+\\vspace{0.3cm}
+\\begin{center}
+\\renewcommand{\\arraystretch}{1.3}
+\\small
+\\begin{tabular}{|>{\\columncolor{secondaryblue!10}}L{3.5cm}|L{12.7cm}|}
+    \\hline
+    \\rowcolor{secondaryblue}
+    \\multicolumn{2}{|c|}{\\textcolor{white}{\\textbf{NASTAVNE METODE, OBLICI RADA I SREDSTVA}}} \\\\
+    \\hline
+    \\textbf{Metode:} & Usmeno izlaganje, demonstracija (prezentacija), razgovor, ilustrativna metoda \\\\
+    \\hline
+    \\textbf{Oblici rada:} & Frontalni rad, individualni rad (radni listić) \\\\
+    \\hline
+    \\textbf{Sredstva:} & Računar, projektor, prezentacija (22 slajda), tabla, radni listići \\\\
+    \\hline
+    \\textbf{Korelacija:} & Osnove digitalne elektronike, Digitalna integrirana kola, Osnove elektrotehnike \\\\
+    \\hline
+\\end{tabular}
+\\end{center}
+\\section{Ciljevi nastavnog časa}
+\\begin{tcolorbox}[colback=primaryblue!5,colframe=primaryblue,title={\\faGraduationCap\\ OBRAZOVNI CILJEVI},fonttitle=\\bfseries]
+\\small Učenici će biti u stanju:
+\\begin{itemize}[nosep, leftmargin=*]
+    \\item \\textbf{Definirati} I\\textsuperscript{2}L tehnologiju i objasniti značenje skraćenice
+    \\item \\textbf{Nabrojati} i opisati dva osnovna elementa I\\textsuperscript{2}L ćelije (PNP injektor, NPN prekidač)
+    \\item \\textbf{Objasniti} princip rada I\\textsuperscript{2}L ćelije i ulogu injekcijske struje
+    \\item \\textbf{Nacrtati} osnovnu shemu I\\textsuperscript{2}L ćelije sa označenim komponentama
+    \\item \\textbf{Opisati} funkciju višestrukih kolektora i Wired-AND povezivanje
+    \\item \\textbf{Navesti} naponske nivoe: $V_{OH} \\approx 0.7$V, $V_{OL} \\approx 0.1$V
+    \\item \\textbf{Usporediti} I\\textsuperscript{2}L sa TTL i CMOS tehnologijom
+    \\item \\textbf{Nabrojati} prednosti i nedostatke I\\textsuperscript{2}L tehnologije
+\\end{itemize}
+\\end{tcolorbox}
+\\vspace{0.2cm}
+\\begin{tcolorbox}[colback=accentgreen!10,colframe=accentgreen,title={\\faHeart\\ ODGOJNI CILJEVI},fonttitle=\\bfseries\\small,height=3.4cm]
+\\footnotesize
+\\begin{itemize}[nosep, leftmargin=*]
+    \\item Razvijanje interesa za historiju elektronike
+    \\item Razumijevanje evolucije tehnologije
+    \\item Kritičko razmišljanje o prednostima/nedostacima
+    \\item Poštivanje naučnih dostignuća
+    \\item Preciznost u tehničkom izražavanju
+\\end{itemize}
+\\end{tcolorbox}
+\\hfill
+\\begin{tcolorbox}[colback=accentorange!10,colframe=accentorange,title={\\faCogs\\ FUNKCIONALNI CILJEVI},fonttitle=\\bfseries\\small,height=3.4cm]
+\\footnotesize
+\\begin{itemize}[nosep, leftmargin=*]
+    \\item Čitanje i crtanje elektroničkih shema
+    \\item Analiza rada bipolarnih tranzistora
+    \\item Razumijevanje logičkih funkcija
+    \\item Uspoređivanje tehničkih parametara
+    \\item Primjena znanja iz prethodnih lekcija
+\\end{itemize}
+\\end{tcolorbox}
+\\newpage
+\\section{Artikulacija nastavnog časa (45 minuta)}
+\\begin{alertbox}[\\faClock\\ VREMENSKI RASPORED]
+\\centering\\small
+\\begin{tabular}{|c|l|c|}
+    \\hline
+    \\rowcolor{accentorange!30}
+    \\textbf{Faza} & \\textbf{Naziv} & \\textbf{Trajanje} \\\\
+    \\hline
+    1 & Uvodni dio (motivacija, najava teme, povezivanje sa TTL) & 5 min \\\\
+    \\hline
+    2 & Glavni dio I -- Uvod u I\\textsuperscript{2}L, historija, osnovna struktura & 12 min \\\\
+    \\hline
+    3 & Glavni dio II -- Princip rada, logička stanja, višestruki kolektori & 12 min \\\\
+    \\hline
+    4 & Glavni dio III -- Karakteristike, usporedba, prednosti/nedostaci & 8 min \\\\
+    \\hline
+    5 & Završni dio (ponavljanje, radni listić, zaključak) & 8 min \\\\
+    \\hline
+\\end{tabular}
+\\end{alertbox}
+\\vspace{0.3cm}
+\\subsection{UVODNI DIO (5 minuta)}
+\\renewcommand{\\arraystretch}{1.5}
+\\small
+\\begin{tabular}{|L{7.5cm}|L{7.5cm}|}
+    \\hline
+    \\rowcolor{primaryblue}
+    \\multicolumn{1}{|c|}{\\textcolor{white}{\\textbf{AKTIVNOST NASTAVNIKA}}} & \\multicolumn{1}{c|}{\\textcolor{white}{\\textbf{AKTIVNOST UČENIKA}}} \\\\
+    \\hline
+    \\multicolumn{2}{|c|}{\\cellcolor{primaryblue!15}\\textbf{MOTIVACIJA I NAJAVA (5 min)}} \\\\
+    \\hline
+    Pozdravlja učenike. Podsjeća na prethodne lekcije: \\textit{"Učili smo o TTL logici. Koliko tranzistora ima TTL NAND vrata?"}
+    Uvodi problem: \\textit{"1970-ih TTL je bio previše složen. Inženjeri su tražili jednostavnije rješenje..."}
+    Najavljuje temu: \\textbf{I\\textsuperscript{2}L -- samo 2 tranzistora po vratima!} &
+    Odgovaraju na pitanja (TTL ima 4+ tranzistora). Razmišljaju o problemu složenosti. Zapisuju naslov.
+    \\\\
+    \\hline
+\\end{tabular}
+\\vspace{0.3cm}
+\\subsection{GLAVNI DIO I -- Uvod u I\\textsuperscript{2}L, historija, struktura (12 minuta)}
+\\small
+\\begin{tabular}{|L{7.5cm}|L{7.5cm}|}
+    \\hline
+    \\rowcolor{secondaryblue}
+    \\multicolumn{1}{|c|}{\\textcolor{white}{\\textbf{AKTIVNOST NASTAVNIKA}}} & \\multicolumn{1}{c|}{\\textcolor{white}{\\textbf{AKTIVNOST UČENIKA}}} \\\\
+    \\hline
+    \\multicolumn{2}{|c|}{\\cellcolor{secondaryblue!15}\\textbf{DEFINICIJA I HISTORIJA (4 min)}} \\\\
+    \\hline
+    Objašnjava: \\textit{"I\\textsuperscript{2}L = Integrated Injection Logic"}. Historija: 1972., Hart i Slob (Philips), Berger i Wiedmann (IBM). &
+    Prate i zapisuju: I\\textsuperscript{2}L = Integrated Injection Logic, godina 1972.
+    \\\\
+    \\hline
+    \\multicolumn{2}{|c|}{\\cellcolor{secondaryblue!15}\\textbf{OSNOVNA STRUKTURA ĆELIJE (8 min)}} \\\\
+    \\hline
+    Crta blok dijagram: \\textbf{PNP injektor} (lateralni, izvor struje) + \\textbf{NPN prekidač} (vertikalni, logička funkcija). Crta shemu. \\textit{"Samo 2 tranzistora umjesto 4+ kod TTL!"} &
+    Crtaju dijagram u bilježnice. Označavaju: $V_{CC}$, GND, ulaz, izlazi ($C_1, C_2, C_n$).
+    \\\\
+    \\hline
+\\end{tabular}
+\\newpage
+\\subsection{GLAVNI DIO II -- Princip rada, logička stanja (12 minuta)}
+\\small
+\\begin{tabular}{|L{7.5cm}|L{7.5cm}|}
+    \\hline
+    \\rowcolor{accentgreen}
+    \\multicolumn{1}{|c|}{\\textcolor{white}{\\textbf{AKTIVNOST NASTAVNIKA}}} & \\multicolumn{1}{c|}{\\textcolor{white}{\\textbf{AKTIVNOST UČENIKA}}} \\\\
+    \\hline
+    \\multicolumn{2}{|c|}{\\cellcolor{accentgreen!15}\\textbf{INJEKCIJA STRUJE (4 min)}} \\\\
+    \\hline
+    Objašnjava: emiter PNP na $V_{CC}$, kolektor PNP = baza NPN. \\textit{"PNP ubrizgava struju u bazu NPN-a."}
+    Formula: $I_{inj} = \\frac{V_{CC} - V_{BE}}{R_{inj}}$ &
+    Prate na dijagramu. Zapisuju formulu za $I_{inj}$.
+    \\\\
+    \\hline
+    \\multicolumn{2}{|c|}{\\cellcolor{accentgreen!15}\\textbf{LOGIČKA STANJA (5 min)}} \\\\
+    \\hline
+    \\textbf{Ulaz LOW (0V):} NPN OFF, $I_{inj}$ na izlaz, Izlaz = HIGH ($\\approx$0.7V).
+    \\textbf{Ulaz HIGH ($V_{BE}$):} NPN SAT, $I_{inj}$ kroz NPN, Izlaz = LOW ($\\approx$0.1V).
+    Crta tablicu istinitosti: \\textbf{INVERTOR!} &
+    Crtaju tablicu: 0$\\to$1, 1$\\to$0. Zaključuju: I\\textsuperscript{2}L ćelija = INVERTOR.
+    \\\\
+    \\hline
+    \\multicolumn{2}{|c|}{\\cellcolor{accentgreen!15}\\textbf{VIŠESTRUKI KOLEKTORI (3 min)}} \\\\
+    \\hline
+    Objašnjava: jedan NPN može imati više kolektora. \\textbf{Wired-AND} spajanjem kolektora.
+    $Y = \\overline{A+B}$ (NOR) &
+    Zapisuju: fan-out = 3--8. Razumiju Wired-AND i NOR funkciju.
+    \\\\
+    \\hline
+\\end{tabular}
+\\vspace{0.3cm}
+\\subsection{GLAVNI DIO III -- Karakteristike, usporedba (8 minuta)}
+\\small
+\\begin{tabular}{|L{7.5cm}|L{7.5cm}|}
+    \\hline
+    \\rowcolor{accentorange}
+    \\multicolumn{1}{|c|}{\\textcolor{white}{\\textbf{AKTIVNOST NASTAVNIKA}}} & \\multicolumn{1}{c|}{\\textcolor{white}{\\textbf{AKTIVNOST UČENIKA}}} \\\\
+    \\hline
+    \\multicolumn{2}{|c|}{\\cellcolor{accentorange!15}\\textbf{NAPONSKI NIVOI (3 min)}} \\\\
+    \\hline
+    Navodi: $V_{OH}$=0.7V, $V_{OL}$=0.1V, $V_{swing}$=0.6V. Uspoređuje: TTL ima $V_{swing}\\approx$3.5V &
+    Zapisuju nivoe. Uočavaju mali $V_{swing}$ kao nedostatak.
+    \\\\
+    \\hline
+    \\multicolumn{2}{|c|}{\\cellcolor{accentorange!15}\\textbf{USPOREDBA I PREDNOSTI/NEDOSTACI (5 min)}} \\\\
+    \\hline
+    Crta tabelu: I\\textsuperscript{2}L ($<$1V, 0.01--1mW) vs TTL (5V, 10mW) vs CMOS (3--5V, $\\mu$W).
+    \\textbf{+} Visoka gustoća, mala potrošnja, jednostavan proces.
+    \\textbf{--} Mali $V_{swing}$, osjetljivost na šum, zastarjelo. &
+    Crtaju tabelu usporedbe. Zapisuju 3 prednosti i 3 nedostatka.
+    \\\\
+    \\hline
+\\end{tabular}
+\\newpage
+\\subsection{ZAVRŠNI DIO (8 minuta)}
+\\small
+\\begin{tabular}{|L{7.5cm}|L{7.5cm}|}
+    \\hline
+    \\rowcolor{primaryblue}
+    \\multicolumn{1}{|c|}{\\textcolor{white}{\\textbf{AKTIVNOST NASTAVNIKA}}} & \\multicolumn{1}{c|}{\\textcolor{white}{\\textbf{AKTIVNOST UČENIKA}}} \\\\
+    \\hline
+    \\multicolumn{2}{|c|}{\\cellcolor{primaryblue!15}\\textbf{PONAVLJANJE (5 min)}} \\\\
+    \\hline
+    Postavlja pitanja: 1. Šta znači I\\textsuperscript{2}L? 2. Dva elementa ćelije? 3. Funkcija PNP? 4. Logička funkcija? 5. $V_{OH}$=? 6. Glavna prednost? &
+    Odgovaraju: 1. Integrated Injection Logic 2. PNP+NPN 3. Izvor struje 4. INVERTOR 5. 0.7V 6. Visoka gustoća
+    \\\\
+    \\hline
+    \\multicolumn{2}{|c|}{\\cellcolor{primaryblue!15}\\textbf{RADNI LISTIĆ I ZAKLJUČAK (3 min)}} \\\\
+    \\hline
+    Dijeli radne listiće. Zaključak: \\textit{"I\\textsuperscript{2}L -- ključna prijelazna tehnologija TTL$\\to$CMOS."} Najava: \\textit{"Sljedeći čas: CMOS logička kola."} &
+    Primaju listiće. Počinju rješavati. Pozdravljaju nastavnika.
+    \\\\
+    \\hline
+\\end{tabular}
+\\vspace{0.4cm}
+\\section{Plan ploče}
+\\begin{center}
+\\begin{tikzpicture}[scale=0.82]
+    \\draw[very thick, primaryblue, rounded corners] (0,0) rectangle (20,13);
+    \\fill[primaryblue!5] (0.1,0.1) rectangle (19.9,12.9);
+    \\node[font=\\large\\bfseries] at (10,12.3) {I\\textsuperscript{2}L -- INTEGRIRANA INJEKCIJSKA LOGIKA};
+    \\draw[primaryblue, thick] (1,11.8) -- (19,11.8);
+    \\node[font=\\bfseries\\small, primaryblue] at (5,11.3) {DEFINICIJA};
+    \\draw[thick] (0.5,9.5) rectangle (9.5,11);
+    \\node[align=left, font=\\scriptsize, anchor=north west] at (0.7,10.8) {I\\textsuperscript{2}L = Integrated Injection Logic\\\\Godina: 1972. (Philips, IBM)\\\\Bipolarna logička obitelj, 2 tranzistora/vrata};
+    \\node[font=\\bfseries\\small, primaryblue] at (5,9.1) {OSNOVNA STRUKTURA};
+    \\draw[thick] (0.5,6.8) rectangle (9.5,8.8);
+    \\node[align=left, font=\\scriptsize, anchor=north west] at (0.7,8.6) {1. \\textbf{PNP injektor} -- lateralni, izvor struje\\\\2. \\textbf{NPN prekidač} -- vertikalni, logička funkcija\\\\Višestruki kolektori $\\rightarrow$ fan-out};
+    \\node[font=\\bfseries\\small, primaryblue] at (15,11.3) {PRINCIP RADA};
+    \\draw[thick] (10.5,9.5) rectangle (19.5,11);
+    \\node[align=left, font=\\scriptsize, anchor=north west] at (10.7,10.8) {$I_{inj}$ iz PNP u bazu NPN\\\\Ulaz LOW $\\rightarrow$ NPN OFF $\\rightarrow$ Izlaz HIGH\\\\Ulaz HIGH $\\rightarrow$ NPN SAT $\\rightarrow$ Izlaz LOW};
+    \\node[font=\\bfseries\\small, primaryblue] at (15,9.1) {NAPONSKI NIVOI};
+    \\draw[thick] (10.5,6.8) rectangle (19.5,8.8);
+    \\node[align=left, font=\\scriptsize, anchor=north west] at (10.7,8.6) {$V_{OH}$ = 0.7V (HIGH) = $V_{BE}$\\\\$V_{OL}$ = 0.1V (LOW) = $V_{CE,sat}$\\\\$V_{swing}$ = 0.6V (mali naponski hod!)};
+    \\node[font=\\bfseries\\small, primaryblue] at (5,6.4) {LOGIČKA FUNKCIJA};
+    \\draw[thick] (0.5,4.8) rectangle (9.5,6.1);
+    \\node[align=left, font=\\scriptsize, anchor=north west] at (0.7,5.9) {Osnovna ćelija = \\textbf{INVERTOR} ($Y = \\overline{A}$)\\\\Wired-AND: $Y = \\overline{A+B}$ = NOR funkcija};
+    \\node[font=\\bfseries\\small, primaryblue] at (15,6.4) {USPOREDBA};
+    \\draw[thick] (10.5,4.8) rectangle (19.5,6.1);
+    \\node[align=center, font=\\scriptsize] at (15,5.45) {I\\textsuperscript{2}L: $<$1V, 0.01mW | TTL: 5V, 10mW | CMOS: 3--5V, $\\mu$W};
+    \\node[font=\\bfseries\\small, primaryblue] at (10,4.4) {PREDNOSTI I NEDOSTACI};
+    \\draw[thick] (2,2) rectangle (18,4.1);
+    \\node[align=center, font=\\scriptsize] at (10,3.2) {\\textbf{+} Visoka gustoća | Mala potrošnja | Jednostavan proces\\\\\\textbf{--} Mali $V_{swing}$ (0.6V) | Osjetljivost na šum | Zastarjelo};
+    \\node[font=\\small, draw, fill=goldcolor!20, rounded corners] at (10,1.2) {\\textbf{KLJUČNO:} I\\textsuperscript{2}L = PNP injektor + NPN prekidač = INVERTOR sa višestrukim izlazima};
+\\end{tikzpicture}
+\\end{center}
+\\newpage
+\\section{Radni listić za učenike}
+\\begin{tcolorbox}[colback=white,colframe=primaryblue,title={\\faMicrochip\\ RADNI LISTIĆ -- I\\textsuperscript{2}L Integrirana Injekcijska Logika},fonttitle=\\bfseries]
+\\small
+\\textbf{Ime i prezime:} \\underline{\\hspace{4.5cm}} \\textbf{Razred:} \\underline{\\hspace{1.5cm}} \\textbf{Datum:} \\underline{\\hspace{2cm}}
+\\vspace{0.4cm}
+
+\\textbf{1.} Napišite puni naziv skraćenice I\\textsuperscript{2}L na engleskom i bosanskom jeziku: (2 boda)
+
+Engleski: \\underline{\\hspace{6cm}} \\quad Bosanski: \\underline{\\hspace{6cm}}
+\\vspace{0.3cm}
+
+\\textbf{2.} Navedite dva osnovna elementa I\\textsuperscript{2}L ćelije i njihovu funkciju: (4 boda)
+\\begin{tabular}{|l|l|l|}\\hline & \\textbf{Element} & \\textbf{Funkcija} \\\\\\hline a) & \\underline{\\hspace{4cm}} & \\underline{\\hspace{6cm}} \\\\\\hline b) & \\underline{\\hspace{4cm}} & \\underline{\\hspace{6cm}} \\\\\\hline\\end{tabular}
+\\vspace{0.3cm}
+
+\\textbf{3.} Dopunite naponske nivoe I\\textsuperscript{2}L logike: (3 boda)
+
+$V_{OH}$ = \\underline{\\hspace{2cm}} V \\qquad $V_{OL}$ = \\underline{\\hspace{2cm}} V \\qquad $V_{swing}$ = \\underline{\\hspace{2cm}} V
+\\vspace{0.3cm}
+
+\\textbf{4.} Popunite tablicu istinitosti i napišite logičku funkciju: (3 boda)
+\\begin{minipage}{0.3\\textwidth}\\begin{tabular}{|c|c|}\\hline \\textbf{Ulaz A} & \\textbf{Izlaz Y} \\\\\\hline 0 & \\underline{\\hspace{1cm}} \\\\\\hline 1 & \\underline{\\hspace{1cm}} \\\\\\hline\\end{tabular}\\end{minipage}\\hfill\\begin{minipage}{0.6\\textwidth}Logička funkcija: $Y =$ \\underline{\\hspace{3cm}}\\\\[0.3cm]Naziv funkcije: \\underline{\\hspace{4cm}}\\end{minipage}
+\\vspace{0.3cm}
+
+\\textbf{5.} Šta je "Wired-AND" i koja logička funkcija nastaje spajanjem kolektora dviju I\\textsuperscript{2}L ćelija? (2 boda)
+\\vspace{0.8cm}\\dotfill
+\\vspace{0.3cm}
+
+\\textbf{6.} Dopunite tabelu usporedbe logičkih obitelji: (3 boda)
+\\begin{tabular}{|l|c|c|c|}\\hline \\textbf{Parametar} & \\textbf{I\\textsuperscript{2}L} & \\textbf{TTL} & \\textbf{CMOS} \\\\\\hline Napajanje & \\underline{\\hspace{2cm}} V & 5 V & 3.3--5 V \\\\\\hline Potrošnja/vrata & 0.01--1 mW & \\underline{\\hspace{2cm}} mW & $\\mu$W \\\\\\hline Gustoća integracije & \\underline{\\hspace{2cm}} & Srednja & Visoka \\\\\\hline\\end{tabular}
+\\vspace{0.3cm}
+
+\\textbf{7.} Navedite tri prednosti I\\textsuperscript{2}L tehnologije: (3 boda)
+
+a) \\underline{\\hspace{5cm}} \\quad b) \\underline{\\hspace{5cm}} \\quad c) \\underline{\\hspace{5cm}}
+\\vspace{0.3cm}
+
+\\textbf{8.} Navedite tri nedostatka I\\textsuperscript{2}L tehnologije: (3 boda)
+
+a) \\underline{\\hspace{5cm}} \\quad b) \\underline{\\hspace{5cm}} \\quad c) \\underline{\\hspace{5cm}}
+\\vspace{0.3cm}
+
+\\textbf{9.} Koje godine je razvijena I\\textsuperscript{2}L i koje su je kompanije razvile? (2 boda)
+
+Godina: \\underline{\\hspace{2cm}} \\qquad Kompanije: \\underline{\\hspace{4cm}} i \\underline{\\hspace{4cm}}
+\\vspace{0.5cm}
+\\begin{flushright}\\textbf{Ukupno bodova:} \\underline{\\hspace{1.5cm}} / 25 \\qquad \\textbf{Ocjena:} \\underline{\\hspace{1.5cm}}\\end{flushright}
+\\end{tcolorbox}
+\\newpage
+\\section{Rješenja radnog listića}
+\\begin{successbox}[\\faCheckCircle\\ RJEŠENJA]
+\\small
+\\textbf{1.} Engleski: \\textbf{Integrated Injection Logic} \\quad Bosanski: \\textbf{Integrirana Injekcijska Logika} (2 boda)\\\\
+\\textbf{2.} a) \\textbf{PNP injektor} -- izvor injekcijske struje \\quad b) \\textbf{NPN prekidač} -- logička funkcija (4 boda)\\\\
+\\textbf{3.} $V_{OH}$ = \\textbf{0.7} V, $V_{OL}$ = \\textbf{0.1} V, $V_{swing}$ = \\textbf{0.6} V (3 boda)\\\\
+\\textbf{4.} 0$\\to$\\textbf{1}, 1$\\to$\\textbf{0} \\quad $Y = \\overline{A}$ \\quad Naziv: \\textbf{INVERTOR} (NOT) (3 boda)\\\\
+\\textbf{5.} Wired-AND = spajanje kolektora $\\to$ AND funkcija invertiranih ulaza. Dvije ćelije $\\to$ \\textbf{NOR}: $Y = \\overline{A+B}$ (2 boda)\\\\
+\\textbf{6.} I\\textsuperscript{2}L: \\textbf{$<$1V}, TTL: \\textbf{1--20 mW}, I\\textsuperscript{2}L gustoća: \\textbf{Vrlo visoka} (3 boda)\\\\
+\\textbf{7.} Visoka gustoća integracije, Niska potrošnja, Jednostavan proces (3 boda)\\\\
+\\textbf{8.} Mali $V_{swing}$, Niska otpornost na šum, Ograničen fan-out (3 boda)\\\\
+\\textbf{9.} Godina: \\textbf{1972} \\quad Kompanije: \\textbf{Philips} i \\textbf{IBM} (2 boda)\\\\
+\\vspace{0.2cm}
+\\textbf{Skala:} 0--12=nedovoljan(1), 13--15=dovoljan(2), 16--18=dobar(3), 19--22=vrlo dobar(4), 23--25=odličan(5)
+\\end{successbox}
+\\section{Evaluacija i procjena uspješnosti}
+\\begin{minipage}[t]{0.48\\textwidth}
+\\begin{infobox}[\\faChartLine\\ KRITERIJI USPJEŠNOSTI]
+\\footnotesize\\begin{itemize}[nosep,leftmargin=*]
+    \\item 80\\% učenika zna dva elementa I\\textsuperscript{2}L ćelije
+    \\item Učenici znaju funkciju PNP injektora
+    \\item Znaju da je osnovna ćelija INVERTOR
+    \\item Znaju $V_{OH}$ i $V_{OL}$
+    \\item 70\\% postiže pozitivnu ocjenu na listiću
+\\end{itemize}\\end{infobox}
+\\end{minipage}\\hfill
+\\begin{minipage}[t]{0.48\\textwidth}
+\\begin{alertbox}[\\faExclamationTriangle\\ MOGUĆE POTEŠKOĆE]
+\\footnotesize\\begin{tabular}{|L{3.2cm}|L{3.5cm}|}\\hline
+\\textbf{Poteškoća} & \\textbf{Rješenje} \\\\\\hline
+Pojam "injekcija" & Analogija: pumpa za vodu \\\\\\hline
+PNP vs NPN & PNP=struja, NPN=logika \\\\\\hline
+Mali $V_{swing}$ & Usporediti s TTL \\\\\\hline
+Wired-AND & Crtež spajanja \\\\\\hline
+\\end{tabular}\\end{alertbox}
+\\end{minipage}
+\\vspace{0.4cm}
+\\begin{infobox}[\\faStickyNote\\ NAPOMENE ZA NASTAVNIKA]
+\\footnotesize\\begin{itemize}[nosep,leftmargin=*]
+    \\item Povezati sa gradivom o TTL logici i bipolarnim tranzistorima
+    \\item Naglasiti historijski značaj I\\textsuperscript{2}L kao prijelazne tehnologije (TTL $\\rightarrow$ CMOS)
+    \\item Koristiti boje: narandžasta za PNP, plava za NPN na crtežima
+    \\item Napomenuti da se I\\textsuperscript{2}L danas rijetko koristi, ali principi su važni
+    \\item Za naprednije: spomenuti BiCMOS kao modernu kombinaciju
+\\end{itemize}\\end{infobox}
+\\vspace{0.4cm}
+\\begin{center}
+\\begin{tikzpicture}
+    \\node[draw,rounded corners,fill=primaryblue!10,minimum width=15cm,minimum height=2cm,align=center]{
+        \\textbf{BILJEŠKE NAKON ČASA}\\\\[0.2cm]
+        \\begin{minipage}{14cm}\\dotfill\\\\[0.3cm]\\dotfill\\\\[0.3cm]\\dotfill\\end{minipage}
+    };
+\\end{tikzpicture}
+\\end{center}
+\\vspace{0.3cm}
+\\begin{flushright}\\textbf{Potpis nastavnika:} \\underline{\\hspace{4.5cm}}\\end{flushright}
+\\end{document}`;
+
+async function generatePriprema() {
+  const apiKey = document.getElementById('apiKey').value.trim();
+  const predmet = document.getElementById('predmet').value.trim();
+  const tema = document.getElementById('tema').value.trim();
+  const nastavnik = document.getElementById('nastavnik').value.trim();
+  const skola = document.getElementById('skola').value.trim();
+  const razred = document.getElementById('razred').value.trim();
+  const brojUcenika = document.getElementById('brojUcenika').value;
+  const tipCasa = document.getElementById('tipCasa').value;
+  const napomene = document.getElementById('napomene').value.trim();
+
+  if (!apiKey) return showStatus('error', 'Unesite Groq API ključ!');
+  if (!predmet) return showStatus('error', 'Unesite naziv predmeta!');
+  if (!tema) return showStatus('error', 'Unesite nastavnu jedinicu (temu)!');
+  if (!razred) return showStatus('error', 'Unesite razred!');
+
+  setLoading(true);
+  showStatus('info', 'Generisanje pripreme — molimo pričekajte (20–40 sekundi)...');
+
+  const systemPrompt = `Ti si iskusan nastavnik i LaTeX ekspert koji prilagođava nastavne pripreme.
+Dobijas kompletan LaTeX dokument kao referencu. Vraćaš IDENTIČNO strukturiran dokument za novi predmet i temu.
+
+PRAVILA koja se moraju poštovati:
+1. Zadrži IDENTIČNU LaTeX strukturu i sve iste okoline: tcolorbox, tikzpicture, tabular, minipage, enumerate, itemize
+2. Zadrži iste boje: primaryblue, secondaryblue, accentorange, accentgreen, goldcolor, lightgray
+3. Zadrži iste dimenzije kolona: L{7.5cm}|L{7.5cm} u articulaciji, L{3.8cm} u identifikaciji
+4. Zadrži iste fontawesome ikone: faGraduationCap, faHeart, faCogs, faClock, faChartLine, faExclamationTriangle, faStickyNote, faMicrochip, faCheckCircle
+5. Vremenski raspored IDENTIČAN: 5+12+12+8+8 minuta, iste faze
+6. Radni listić: 9 pitanja, 25 bodova ukupno, ista skala ocjenjivanja
+7. tikzpicture plan ploče: draw[very thick, primaryblue, rounded corners] (0,0) rectangle (20,13) -- OBAVEZNO
+8. Naslovna strana: isti tikzpicture i tcolorbox format
+9. Iste pakete u preambuli, ne dodavaj nove
+10. Mijenjaj SAMO sadržaj: predmet, temu, nastavnika, školu, razred, broj učenika, tekst artikulacije, ciljeve, pitanja, rješenja, plan ploče
+11. Sadržaj mora biti STRUČNO TAČAN za novi predmet/temu
+12. Jezik: bosanski/hrvatski ijekavica
+13. Artikulacija: konkretna pitanja nastavnika u \\textit{} italiku, konkretni odgovori učenika
+14. Plan ploče: sadržaj specifičan za temu (formule, dijagrami, pojmovi)
+15. Vrati KOMPLETAN LaTeX dokument od \\documentclass do \\end{document}
+16. Bez markdown ograđivanja, bez objašnjenja — samo čisti LaTeX`;
+
+  const userPrompt = `Referentni LaTeX dokument (priprema za I²L temu):
+
+${ORIGINAL_DOC}
+
+---
+PRILAGODI ZA:
+- Škola: ${skola}
+- Predmet: ${predmet}
+- Nastavna jedinica: ${tema}
+- Nastavnik: ${nastavnik}
+- Razred: ${razred}
+- Broj učenika: ${brojUcenika}
+- Tip časa: ${tipCasa}
+${napomene ? `- Napomene: ${napomene}` : ''}
+
+Zadrži IDENTIČNU LaTeX strukturu. Promijeni samo nastavni sadržaj za novu temu. Vrati kompletan LaTeX dokument.`;
+
+  try {
+    const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'mistral-large-latest',
+        max_tokens: 16000,
+        temperature: 0.2,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ]
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error?.message || `HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    let finalLatex = data.choices[0].message.content.trim();
+
+    // Ukloni sve varijante markdown ogradjivanja
+    finalLatex = finalLatex
+      .replace(/^```latex[^\n]*/im, '').replace(/^```tex[^\n]*/im, '')
+      .replace(/^```[^\n]*/im, '').replace(/```[\s\S]*$/gim, '').trim();
+
+    // Ako AI stavi tekst prije \documentclass, odrezi ga
+    const docStart = finalLatex.indexOf('\\documentclass');
+    if (docStart > 0) finalLatex = finalLatex.substring(docStart);
+
+    // Ako nema \documentclass uopce — prikazi debug i baci gresku
+    if (!finalLatex.includes('\\documentclass')) {
+      document.getElementById('latexOutput').value = '% DEBUG - AI odgovor (nije validan LaTeX):\n' + finalLatex;
+      document.getElementById('resultSection').classList.add('visible');
+      throw new Error('AI nije vratio LaTeX kod. Pogledaj editor za debug. Pokusaj ponovo.');
+    }
+
+    // Ako nedostaje \end{document} (odrezen zbog tokena) — dodaj ga
+    if (!finalLatex.includes('\\end{document}')) {
+      finalLatex += '\n\\end{document}';
+    }
+
+    document.getElementById('latexOutput').value = finalLatex;
+    document.getElementById('resultSection').classList.add('visible');
+    document.getElementById('compileSection').classList.add('visible');
+    showStatus('success', `✓ Priprema generisana! Predmet: ${predmet} — Tema: ${tema}`);
+    document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  } catch (err) {
+    console.error(err);
+    showStatus('error', `Greška: ${err.message}`);
+  } finally {
+    setLoading(false);
+  }
+}
+
+
+
+async function compileTexlive() {
+  const latex = document.getElementById('latexOutput').value;
+  if (!latex) return;
+
+  showCompileStatus('info', 'Kompajliranje - molimo pričekajte...');
+  document.getElementById('pdfFrameWrap').classList.remove('visible');
+
+  try {
+    // Automatski koristi Render u production, localhost u development
+    const isLocal = window.location.hostname === 'localhost' || 
+                    window.location.hostname === '127.0.0.1';
+    
+    const BACKEND_URL = isLocal 
+      ? 'http://localhost:5000/compile'
+      : 'https://https://latex-proxy-server.onrender.com//compile';  // ← Zamijeni
+    
+    console.log('🔗 Backend URL:', BACKEND_URL);
+    
+    const resp = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ latex: latex })
+    });
+
+    if (!resp.ok) {
+      const errorData = await resp.json();
+      throw new Error(errorData.error || 'Greška kompajliranja');
+    }
+
+    const contentType = resp.headers.get('content-type') || '';
+
+    if (contentType.includes('pdf')) {
+      const blob = await resp.blob();
+      const pdfUrl = URL.createObjectURL(blob);
+      const frame = document.getElementById('pdfFrame');
+      frame.src = pdfUrl;
+      document.getElementById('pdfFrameWrap').classList.add('visible');
+
+      showCompileStatus('success', 
+        '✓ PDF generisan! <a href="' + pdfUrl + '" download="priprema.pdf" ' +
+        'style="color:var(--green);font-weight:bold;margin-left:8px">⬇ Skini PDF</a>');
+      
+      document.getElementById('compileStatusText').innerHTML =
+        '✓ PDF generisan! &nbsp;<a href="' + pdfUrl + '" download="priprema.pdf" ' +
+        'style="color:var(--green);font-weight:bold">⬇ Skini PDF</a>';
+      
+      return;
+    } else {
+      throw new Error('Server nije vratio PDF');
+    }
+
+  } catch(err) {
+    console.error('❌ Greška:', err);
+    showCompileStatus('error', 
+      '❌ Greška: ' + err.message + 
+      ' — <a href="#" onclick="compileWithOverleaf(); return false;" ' +
+      'style="color:var(--gold);font-weight:bold">Pokušaj Overleaf</a>');
+  }
+}
+function _overleafPost(latex) {
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = 'https://www.overleaf.com/docs';
+  form.target = '_blank';
+  const inp = document.createElement('input');
+  inp.type = 'hidden'; inp.name = 'snip'; inp.value = latex;
+  form.appendChild(inp);
+  const nm = document.createElement('input');
+  nm.type = 'hidden'; nm.name = 'snip_name'; nm.value = 'priprema.tex';
+  form.appendChild(nm);
+  document.body.appendChild(form);
+  form.submit();
+  document.body.removeChild(form);
+  showCompileStatus('success', 'Overleaf otvoren u novom tabu — klikni Recompile, pa Download PDF.');
+}
+
+function compileWithOverleaf() {
+  const latex = document.getElementById('latexOutput').value;
+  if (!latex) return;
+  _overleafPost(latex);
+}
+
+
+
+function copyLatex() {
+  const text = document.getElementById('latexOutput').value;
+  navigator.clipboard.writeText(text).then(() => showStatus('success', 'LaTeX kod kopiran!'))
+    .catch(() => { document.getElementById('latexOutput').select(); document.execCommand('copy'); showStatus('success', 'Kopirano!'); });
+}
+
+function downloadLatex() {
+  const text = document.getElementById('latexOutput').value;
+  const predmet = document.getElementById('predmet').value || 'priprema';
+  const tema = document.getElementById('tema').value || 'cas';
+  const filename = `priprema_${predmet}_${tema}.tex`.replace(/\s+/g, '_').toLowerCase();
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function showCompileSection() {
+  document.getElementById('compileSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function setLoading(loading) {
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = loading;
+  document.getElementById('btnSpinner').style.display = loading ? 'block' : 'none';
+  document.getElementById('btnText').textContent = loading ? 'Generisanje...' : '✦ Generiši Pripremu';
+}
+
+function showStatus(type, msg) {
+  const bar = document.getElementById('statusBar');
+  bar.className = `status-bar ${type}`;
+  document.getElementById('statusText').textContent = msg;
+}
+
+function showCompileStatus(type, msg) {
+  const bar = document.getElementById('compileStatus');
+  bar.className = `status-bar ${type}`;
+  document.getElementById('compileStatusText').textContent = msg;
+}
+
+document.getElementById('apiKey').addEventListener('input', function() {
+  sessionStorage.setItem('mistral_api_key', this.value);
+});
+window.addEventListener('load', function() {
+  const saved = sessionStorage.getItem('mistral_api_key');
+  if (saved) document.getElementById('apiKey').value = saved;
+});
+</script>
+</body>
+</html>
